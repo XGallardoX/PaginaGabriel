@@ -953,7 +953,7 @@
             tensor.dispose();
             
             // Convertir predicciones a formato legible
-            const classes = ['libro', 'laptop', 'esfero', 'maleta', 'regla', 'borrador'];
+            const classes = ["regla","esfero","laptop","borrador","libro","maleta"];
             const results = classes.map((className, i) => ({
                 className,
                 probability: predictions[i]
@@ -1016,7 +1016,7 @@
                         tensor.dispose();
                         
                         // Procesar resultados
-                        const classes = ['libro', 'laptop', 'esfero', 'maleta', 'regla', 'borrador'];
+                        const classes = ["regla","esfero","laptop","borrador","libro","maleta"];
                         const results = classes.map((className, i) => ({
                             className,
                             probability: predictions[i]
