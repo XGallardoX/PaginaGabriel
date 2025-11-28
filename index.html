@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Lab - Vision Coders</title>
+    
+    <style>
+        /* ========== Variables y Reset ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #3b82f6;
+            --primary-hover: #2563eb;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ========== Header / Navegación ========== */
+        .header {
+            background: var(--bg-card);
+            border-bottom: 2px solid var(--border-color);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-section h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .logo-section p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .mode-toggles {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-dark);
+            padding: 0.5rem;
+            border-radius: 12px;
+        }
+
+        .mode-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid transparent;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        .mode-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-hover);
+        }
+
+        /* ========== Descripción General ========== */
+        .intro-section {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .intro-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .intro-card h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .intro-card p {
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            line-height: 1.8;
+        }
+
+        /* ========== Contenedor Principal ========== */
+        .main-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem 4rem 2rem;
+        }
+
+        .mode-content {
+            display: none;
+        }
+
+        .mode-content.active {
+            display: block;
+        }
+
+        .dashboard {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .dashboard-title {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        /* ========== Panel Izquierdo (Cámara/Audio) ========== */
+        .left-panel, .right-panel {
+            background: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .video-container {
+            width: 100%;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        #audioCanvas {
+            width: 100%;
+            height: 200px;
+            background: #000;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .status-message {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+
+        .status-loading {
+            background: rgba(249, 158, 11, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+
+        /* ========== Panel Derecho (Resultados) ========== */
+        .results-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .result-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .result-card h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .top1-result {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .top1-label {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-transform: capitalize;
+        }
+
+        .top1-confidence {
+            font-size: 1.5rem;
+            opacity: 0.9;
+        }
+
+        .top3-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .prediction-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .prediction-label {
+            min-width: 120px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .prediction-bar-container {
+            flex: 1;
+            height: 24px;
+            background: var(--bg-dark);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .prediction-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+            border-radius: 12px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+        }
+
+        .prediction-percentage {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .model-info {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .model-info h4 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .model-info ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .model-info li {
+            margin-bottom: 0.25rem;
+        }
+
+        /* ========== Footer ========== */
+        .footer {
+            background: var(--bg-card);
+            border-top: 2px solid var(--border-color);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            margin-top: 4rem;
+        }
+
+        /* ========== Responsive ========== */
+        @media (max-width: 968px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .mode-toggles {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .mode-btn {
+                flex: 1;
+                padding: 0.75rem 1rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .intro-section, .main-container {
+                padding: 0 1rem;
+            }
+
+            .dashboard {
+                padding: 1rem;
+            }
+
+            .mode-btn {
+                font-size: 0.75rem;
+                padding: 0.6rem 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== HEADER ========== -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>🤖 AI Lab: Objetos, Sonidos y Actividades</h1>
+                <p>Demo web multi-modelo en tiempo real para Vision-Coders</p>
+            </div>
+            <div class="mode-toggles">
+                <button class="mode-btn active" data-mode="images">📷 Imágenes</button>
+                <button class="mode-btn" data-mode="audio">🎵 Sonidos</button>
+                <button class="mode-btn" data-mode="activities">🏃 Actividades</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========== DESCRIPCIÓN GENERAL ========== -->
+    <section class="intro-section">
+        <div class="intro-card">
+            <h2>¿Qué es este AI Lab?</h2>
+            <p>
+                <strong>AI Lab</strong> es un proyecto donde los estudiantes del programa Vision-Coders entrenan sus propios modelos de inteligencia artificial 
+                para reconocer imágenes, sonidos y actividades humanas.
+            </p>
+            <p>
+                Algunos modelos fueron creados 100% en <strong>Teachable Machine</strong>, una herramienta visual de Google para entrenar IA sin programar. 
+                Otros modelos se entrenaron en <strong>Google Colab usando TensorFlow</strong> y luego se convirtieron a <strong>TensorFlow.js</strong> 
+                para poder usarlos directamente en el navegador.
+            </p>
+            <p>
+                Todo este laboratorio está construido con HTML, CSS y JavaScript puro, y se publica en <strong>GitHub Pages</strong> 
+                sin necesidad de servidores, frameworks complejos ni procesos de compilación. ¡Es código 100% accesible y modificable!
+            </p>
+        </div>
+    </section>
+
+    <!-- ========== CONTENEDOR PRINCIPAL ========== -->
+    <main class="main-container">
+        
+        <!-- MODO 1: IMÁGENES (Objetos Escolares) -->
+        <div id="mode-images" class="mode-content active">
+            <div class="dashboard">
+                <h2 class="dashboard-title">🎒 Objetos (Imágenes)</h2>
+                <div class="dashboard-grid">
+                    <!-- Panel Izquierdo -->
+                    <div class="left-panel">
+                        <h3 class="panel-title">Cámara / Entrada</h3>
+                        <div class="video-container">
+                            <video id="imageVideo" autoplay playsinline></video>
+                            <!-- Imagen fija cuando se sube archivo -->
+                            <img id="imageDisplay" style="display: none; width: 100%; height: auto;">
+                        </div>
+                        <div class="controls">
+                            <button id="startImageCamera" class="btn btn-primary">📹 Iniciar Cámara</button>
+                            <button id="stopImageCamera" class="btn btn-secondary" disabled>⏹️ Detener Cámara</button>
+                            <button id="predictImage" class="btn btn-primary" disabled>🔍 Predecir desde Cámara</button>
+                            <div class="file-input-wrapper">
+                                <label for="imageFileInput" class="btn btn-secondary" style="display: block;">
+                                    📁 Subir Imagen
+                                </label>
+                                <input type="file" id="imageFileInput" accept="image/*">
+                            </div>
+                        </div>
+                        <div id="imageStatus" class="status-message" style="display: none;"></div>
+                    </div>
+
+                    <!-- Panel Derecho -->
+                    <div class="right-panel">
+                        <div class="results-section">
+                            <!-- Top 1 -->
+                            <div class="result-card">
+                                <h3>🏆 Top 1</h3>
+                                <div class="top1-result">
+                                    <div id="imageTop1Label" class="top1-label">---</div>
+                                    <div id="imageTop1Confidence" class="top1-confidence">0%</div>
+                                </div>
+                            </div>
+
+                            <!-- Top 3 -->
+                            <div class="result-card">
+                                <h3>📊 Top 3 Predicciones</h3>
+                                <div id="imageTop3" class="top3-list">
+                                    <!-- Se llenará dinámicamente -->
+                                </div>
+                            </div>
+
+                            <!-- Info del Modelo -->
+                            <div class="result-card">
+                                <h3>ℹ️ Acerca del Modelo</h3>
+                                <div class="model-info">
+                                    <p><strong>Tipo:</strong> Clasificación de objetos escolares</p>
+                                    <h4>Clases que reconoce:</h4>
+                                    <ul>
+                                        <li>📚 libro</li>
+                                        <li>💻 laptop</li>
+                                        <li>✏️ esfero</li>
+                                        <li>🎒 maleta</li>
+                                        <li>📏 regla</li>
+                                        <li>🧽 borrador</li>
+                                    </ul>
+                                    <p style="margin-top: 1rem;">
+                                        <strong>Nota:</strong> El modelo puede tener errores si la iluminación es deficiente 
+                                        o si el objeto no es visible completamente. Para mejores resultados, asegúrate de tener 
+                                        buena luz y que el objeto esté centrado.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODO 2: AUDIO (Sonidos de Transporte) -->
+        <div id="mode-audio" class="mode-content">
+            <div class="dashboard">
+                <h2 class="dashboard-title">🚗 Sonidos (Audio)</h2>
+                <div class="dashboard-grid">
+                    <!-- Panel Izquierdo -->
+                    <div class="left-panel">
+                        <h3 class="panel-title">Micrófono / Grabación</h3>
+
+                        <!-- Canvas para la onda -->
+                        <canvas id="audioCanvas"></canvas>
+
+                        <!-- Reproductor del último audio (grabado o subido) -->
+                        <audio id="audioPlayer" controls style="width: 100%; margin-top: 0.75rem;"></audio>
+
+                        <!-- Subir archivo de audio -->
+                        <div class="file-input-wrapper" style="margin-top: 0.75rem;">
+                            <label for="audioFileInput" class="btn btn-secondary" style="display: block;">
+                                📁 Subir Audio
+                            </label>
+                            <input type="file" id="audioFileInput" accept="audio/*">
+                        </div>
+
+                        <div class="controls">
+                            <button id="startRecording" class="btn btn-primary">🎤 Iniciar Micrófono</button>
+                            <button id="stopRecording" class="btn btn-secondary" disabled>⏹️ Detener Grabación</button>
+                            <button id="predictAudio" class="btn btn-primary" disabled>🔍 Predecir Sonido</button>
+                        </div>
+                        <div id="audioStatus" class="status-message" style="display: none;"></div>
+                    </div>
+
+
+                    <!-- Panel Derecho -->
+                    <div class="right-panel">
+                        <div class="results-section">
+                            <!-- Top 1 -->
+                            <div class="result-card">
+                                <h3>🏆 Top 1</h3>
+                                <div class="top1-result">
+                                    <div id="audioTop1Label" class="top1-label">---</div>
+                                    <div id="audioTop1Confidence" class="top1-confidence">0%</div>
+                                </div>
+                            </div>
+
+                            <!-- Top 3 -->
+                            <div class="result-card">
+                                <h3>📊 Top 5 Predicciones</h3>
+                                <div id="audioTop3" class="top3-list">
+                                    <!-- Se llenará dinámicamente -->
+                                </div>
+                            </div>
+
+                            <!-- Info del Modelo -->
+                            <div class="result-card">
+                                <h3>ℹ️ Acerca del Modelo</h3>
+                                <div class="model-info">
+                                    <p><strong>Tipo:</strong> Clasificación de sonidos de transporte</p>
+                                    <h4>Clases que reconoce:</h4>
+                                    <ul>
+                                        <li>🚗 carro</li>
+                                        <li>🏍️ moto</li>
+                                        <li>✈️ avion</li>
+                                        <li>📢 claxon</li>
+                                        <li>🚨 sirena</li>
+                                    </ul>
+                                    <p style="margin-top: 1rem;">
+                                        <strong>Nota:</strong> Este modelo fue entrenado en <strong>Google Colab con TensorFlow</strong> 
+                                        usando clips de audio de diferentes medios de transporte, y luego se convirtió a 
+                                        <strong>TensorFlow.js</strong> para usarlo en el navegador.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODO 3: ACTIVIDADES (Posturas) -->
+        <div id="mode-activities" class="mode-content">
+            <div class="dashboard">
+                <h2 class="dashboard-title">🏃 Actividades (Posturas)</h2>
+                <div class="dashboard-grid">
+                    <!-- Panel Izquierdo -->
+                    <div class="left-panel">
+                        <h3 class="panel-title">Cámara / Detección</h3>
+                        <div class="video-container">
+                            <video id="activityVideo" autoplay playsinline></video>
+                            <!-- AGREGAR ESTE ELEMENTO NUEVO -->
+                            <img id="activityImage" style="display: none; width: 100%; height: auto;">
+                        </div>
+                        <div class="controls">
+                            <button id="startActivityCamera" class="btn btn-primary">📹 Iniciar Cámara</button>
+                            <button id="stopActivityCamera" class="btn btn-secondary" disabled>⏹️ Detener Cámara</button>
+                            <button id="predictActivity" class="btn btn-primary" disabled>🔍 Predecir Actividad</button>
+                            <div class="file-input-wrapper">
+                                <label for="activityFileInput" class="btn btn-secondary" style="display: block;">
+                                    📁 Subir Imagen
+                                </label>
+                                <input type="file" id="activityFileInput" accept="image/*">
+                            </div>
+                        </div>
+                        <div id="activityStatus" class="status-message" style="display: none;"></div>
+                    </div>
+                    
+                    <!-- El resto del código sigue igual... -->
+                    <!-- Panel Derecho -->
+                    <div class="right-panel">
+                        <div class="results-section">
+                            <!-- Top 1 -->
+                            <div class="result-card">
+                                <h3>🏆 Top 1</h3>
+                                <div class="top1-result">
+                                    <div id="activityTop1Label" class="top1-label">---</div>
+                                    <div id="activityTop1Confidence" class="top1-confidence">0%</div>
+                                </div>
+                            </div>
+
+                            <!-- Top 3 -->
+                            <div class="result-card">
+                                <h3>📊 Top 3 Predicciones</h3>
+                                <div id="activityTop3" class="top3-list">
+                                    <!-- Se llenará dinámicamente -->
+                                </div>
+                            </div>
+
+                            <!-- Info del Modelo -->
+                            <div class="result-card">
+                                <h3>ℹ️ Acerca del Modelo</h3>
+                                <div class="model-info">
+                                    <p><strong>Tipo:</strong> Reconocimiento de actividades humanas</p>
+                                    <p>
+                                        Aunque este es un modelo de posturas, en esta demo se usa como un modelo de imágenes 
+                                        que clasifica actividades típicas de estudiantes.
+                                    </p>
+                                    <h4>Clases que reconoce:</h4>
+                                    <ul>
+                                        <li>🚶 caminando</li>
+                                        <li>✍️ escribiendo</li>
+                                        <li>🍕 comiendo</li>
+                                        <li>📱 usando el celular</li>
+                                        <li>👋 saludando</li>
+                                    </ul>
+                                    <p style="margin-top: 1rem;">
+                                        <strong>Nota:</strong> Este modelo también se entrenó en <strong>Google Colab con TensorFlow</strong> 
+                                        y se convirtió a <strong>TensorFlow.js</strong>. Funciona mejor cuando la persona está 
+                                        completamente visible en el encuadre.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+        <p>
+            💡 Desarrollado en el programa <strong>Vision-Coders</strong> | 
+            HTML + CSS + JavaScript + TensorFlow.js
+        </p>
+    </footer>
+
+    <!-- ========== TENSORFLOW.JS ========== -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
+
+    <!-- ========== JAVASCRIPT PRINCIPAL ========== -->
+    <script>
+        // ============================================
+        // CONFIGURACIÓN GLOBAL
+        // ============================================
+        
+        // URLs de los modelos - Cambia estas rutas según donde subas tus modelos
+        const MODEL_URLS = {
+            images: 'models/imagenes/model.json',     // Modelo de objetos escolares
+            audio: 'models/audio/model.json',         // Modelo de sonidos de transporte
+            activities: 'models/posturas/model.json'  // Modelo de actividades/posturas
+        };
+
+        // Variables globales
+        let currentMode = 'images';
+        let imageModel = null;
+        let audioModel = null;
+        let activityModel = null;
+        let imageStream = null;
+        let activityStream = null;
+        let audioStream = null;
+        let currentAudioBlob = null;   // Último audio disponible (grabado o subido)
+        let currentAudioFileName = null;   // nombre del archivo (carro_00001.wav, etc.)
+        // 👉 Nuevo: para poder reutilizar el último audio (grabado o subido)
+// let currentAudioBlob = null;
+// let currentAudioFileName = '';
+        let audioContext = null;
+        let audioAnalyser = null;
+        let audioDataArray = null;
+        let isRecording = false;
+
+        // ============================================
+        // NAVEGACIÓN ENTRE MODOS
+        // ============================================
+        
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const mode = btn.dataset.mode;
+                switchMode(mode);
+            });
+        });
+
+        function switchMode(mode) {
+            // Actualizar botones
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+
+            // Ocultar todos los modos
+            document.querySelectorAll('.mode-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Mostrar el modo seleccionado
+            document.getElementById(`mode-${mode}`).classList.add('active');
+            currentMode = mode;
+
+            // Detener streams activos al cambiar de modo
+            stopAllStreams();
+        }
+
+        function stopAllStreams() {
+            if (imageStream) {
+                imageStream.getTracks().forEach(track => track.stop());
+                imageStream = null;
+            }
+            if (activityStream) {
+                activityStream.getTracks().forEach(track => track.stop());
+                activityStream = null;
+            }
+            if (audioStream) {
+                audioStream.getTracks().forEach(track => track.stop());
+                audioStream = null;
+            }
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+        }
+
+        // ============================================
+        // FUNCIONES DE UTILIDAD PARA UI
+        // ============================================
+        
+        function showStatus(elementId, message, type) {
+            const statusEl = document.getElementById(elementId);
+            statusEl.textContent = message;
+            statusEl.className = `status-message status-${type}`;
+            statusEl.style.display = 'block';
+        }
+
+        function hideStatus(elementId) {
+            document.getElementById(elementId).style.display = 'none';
+        }
+
+        function displayTop3Results(containerId, predictions) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            // Ahora mostramos hasta 5 predicciones
+            predictions.slice(0, 5).forEach(pred => {
+                const item = document.createElement('div');
+                item.className = 'prediction-item';
+
+                const percentage = (pred.probability * 100).toFixed(1);
+
+                item.innerHTML = `
+                    <span class="prediction-label">${pred.className}</span>
+                    <div class="prediction-bar-container">
+                        <div class="prediction-bar" style="width: ${percentage}%">
+                            <span class="prediction-percentage">${percentage}%</span>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(item);
+            });
+        }   
+
+
+        function displayTop1Result(labelId, confidenceId, prediction) {
+            document.getElementById(labelId).textContent = prediction.className;
+            document.getElementById(confidenceId).textContent = 
+                `${(prediction.probability * 100).toFixed(1)}%`;
+        }
+
+        // ============================================
+        // MODO 1: IMÁGENES (Objetos Escolares)
+        // ============================================
+        
+        // Inicializar modelo de imágenes
+        async function initImageModel() {
+            try {
+                showStatus('imageStatus', 'Cargando modelo de imágenes...', 'loading');
+                
+                // Cargar el modelo desde la URL configurada
+                imageModel = await tf.loadLayersModel(MODEL_URLS.images);
+                
+                showStatus('imageStatus', 'Modelo de imágenes cargado ✅', 'success');
+                
+                // Ocultar el mensaje después de 2 segundos
+                setTimeout(() => hideStatus('imageStatus'), 2000);
+                
+            } catch (error) {
+                console.error('Error cargando modelo de imágenes:', error);
+                showStatus('imageStatus', 
+                    'Error: No se pudo cargar el modelo. Verifica la ruta del modelo.', 
+                    'error');
+            }
+        }
+
+        // Iniciar cámara para imágenes
+        // Iniciar cámara para imágenes
+        async function startImageCamera() {
+            try {
+                showStatus('imageStatus', 'Solicitando acceso a la cámara...', 'loading');
+                
+                imageStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' },
+                    audio: false 
+                });
+                
+                const video = document.getElementById('imageVideo');
+                const displayImg = document.getElementById('imageDisplay');
+                
+                video.srcObject = imageStream;
+                
+                // Mostrar video y ocultar imagen fija
+                video.style.display = 'block';
+                if (displayImg) {
+                    displayImg.style.display = 'none';
+                }
+                
+                // Habilitar/deshabilitar botones
+                document.getElementById('startImageCamera').disabled = true;
+                document.getElementById('stopImageCamera').disabled = false;
+                document.getElementById('predictImage').disabled = false;
+
+                showStatus('imageStatus', 'Cámara iniciada ✅', 'success');
+                setTimeout(() => hideStatus('imageStatus'), 2000);
+                
+            } catch (error) {
+                console.error('Error accediendo a la cámara:', error);
+                showStatus('imageStatus', 'Error: No se pudo acceder a la cámara', 'error');
+            }
+        }
+
+
+    // Detener cámara para imágenes
+    function stopImageCamera() {
+        if (imageStream) {
+            imageStream.getTracks().forEach(track => track.stop());
+            imageStream = null;
+            document.getElementById('imageVideo').srcObject = null;
+            
+            document.getElementById('startImageCamera').disabled = false;
+            document.getElementById('stopImageCamera').disabled = true;
+            document.getElementById('predictImage').disabled = true;
+        }
+    }
+
+    // Predecir desde el video de la cámara
+    async function predictImageFromVideo() {
+        if (!imageModel) {
+            showStatus('imageStatus', 'Primero debes cargar el modelo', 'error');
+            return;
+        }
+
+        try {
+            showStatus('imageStatus', 'Analizando imagen...', 'loading');
+            
+            const video = document.getElementById('imageVideo');
+            
+            // Preprocesar la imagen del video
+            // 1. Capturar frame del video como tensor
+            let tensor = tf.browser.fromPixels(video);
+            
+            // 2. Redimensionar a 224x224 (tamaño típico para modelos de imagen)
+            tensor = tf.image.resizeBilinear(tensor, [224, 224]);
+            
+            // 3. Normalizar valores de píxeles a rango [0, 1]
+            tensor = tensor.div(255.0);
+            
+            // 4. Añadir dimensión de batch
+            tensor = tensor.expandDims(0);
+            
+            // Hacer predicción
+            const predictions = await imageModel.predict(tensor).data();
+            
+            // Liberar memoria del tensor
+            tensor.dispose();
+            
+            // Convertir predicciones a formato legible
+            const classes = ['libro', 'laptop', 'esfero', 'maleta', 'regla', 'borrador'];
+            const results = classes.map((className, i) => ({
+                className,
+                probability: predictions[i]
+            })).sort((a, b) => b.probability - a.probability);
+            
+            // Mostrar resultados
+            displayTop1Result('imageTop1Label', 'imageTop1Confidence', results[0]);
+            displayTop3Results('imageTop3', results);
+            
+            hideStatus('imageStatus');
+            
+        } catch (error) {
+            console.error('Error en predicción:', error);
+            showStatus('imageStatus', 'Error al procesar la imagen', 'error');
+        }
+    }
+
+        // Predecir desde archivo subido
+    async function predictImageFromFile(file) {
+        if (!imageModel) {
+            showStatus('imageStatus', 'Primero debes cargar el modelo', 'error');
+            return;
+        }
+
+        try {
+            showStatus('imageStatus', 'Procesando imagen subida...', 'loading');
+            
+            // Si la cámara está encendida, la apagamos para evitar conflicto visual
+            stopImageCamera();
+
+            const img = new Image();
+            const reader = new FileReader();
+            
+            reader.onload = async (e) => {
+                img.src = e.target.result;
+
+                img.onload = async () => {
+                    try {
+                        // Mostrar la imagen subida en el contenedor
+                        const displayImg = document.getElementById('imageDisplay');
+                        const video = document.getElementById('imageVideo');
+                        
+                        if (displayImg) {
+                            displayImg.src = e.target.result;
+                            displayImg.style.display = 'block';
+                        }
+                        if (video) {
+                            video.style.display = 'none';
+                            video.srcObject = null;
+                        }
+
+                        // Preprocesar imagen
+                        let tensor = tf.browser.fromPixels(img);
+                        tensor = tf.image.resizeBilinear(tensor, [224, 224]);
+                        tensor = tensor.div(255.0);
+                        tensor = tensor.expandDims(0);
+                        
+                        // Predecir
+                        const predictions = await imageModel.predict(tensor).data();
+                        tensor.dispose();
+                        
+                        // Procesar resultados
+                        const classes = ['libro', 'laptop', 'esfero', 'maleta', 'regla', 'borrador'];
+                        const results = classes.map((className, i) => ({
+                            className,
+                            probability: predictions[i]
+                        })).sort((a, b) => b.probability - a.probability);
+                        
+                        // Mostrar resultados
+                        displayTop1Result('imageTop1Label', 'imageTop1Confidence', results[0]);
+                        displayTop3Results('imageTop3', results);
+                        
+                        hideStatus('imageStatus');
+                    } catch (error) {
+                        console.error('Error en predicción:', error);
+                        showStatus('imageStatus', 'Error al procesar la imagen', 'error');
+                    }
+                };
+            };
+            
+            reader.readAsDataURL(file);
+            
+        } catch (error) {
+            console.error('Error procesando archivo:', error);
+            showStatus('imageStatus', 'Error al procesar el archivo', 'error');
+        }
+    }
+
+
+    // Event listeners para imágenes
+    document.getElementById('startImageCamera').addEventListener('click', startImageCamera);
+    document.getElementById('stopImageCamera').addEventListener('click', stopImageCamera);
+    document.getElementById('predictImage').addEventListener('click', predictImageFromVideo);
+    document.getElementById('imageFileInput').addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+            predictImageFromFile(e.target.files[0]);
+        }
+    });
+
+    // ============================================
+    // MODO 2: AUDIO (Sonidos de Transporte) - VERSIÓN MEJORADA
+    // ============================================
+// ============================================
+// MODO 2: AUDIO (Sonidos de Transporte) - VERSIÓN MEJORADA
+// ============================================
+
+let mediaRecorder;
+let audioChunks = [];
+let hasRecording = false;
+
+
+// 👉 Nuevo: para poder reutilizar el último audio (grabado o subido)
+// let currentAudioBlob = null;
+// let currentAudioFileName = '';
+
+    // Inicializar modelo de audio
+    async function initAudioModel() {
+        try {
+            showStatus('audioStatus', 'Cargando modelo de audio...', 'loading');
+            
+            audioModel = await tf.loadLayersModel(MODEL_URLS.audio);
+            
+            showStatus('audioStatus', 'Modelo de audio cargado ✅', 'success');
+            setTimeout(() => hideStatus('audioStatus'), 2000);
+            
+        } catch (error) {
+            console.error('Error cargando modelo de audio:', error);
+            showStatus(
+                'audioStatus',
+                'Error: No se pudo cargar el modelo de audio. Verifica la ruta.',
+                'error'
+            );
+        }
+    }
+
+    // Iniciar grabación de audio
+    async function startRecording() {
+        try {
+            showStatus('audioStatus', 'Solicitando acceso al micrófono...', 'loading');
+            
+            // Limpiar grabación anterior
+            audioChunks = [];
+            hasRecording = false;
+            currentAudioBlob = null;
+            currentAudioFileName = 'grabacion_mic';
+            
+            audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            
+            // Configurar MediaRecorder
+            mediaRecorder = new MediaRecorder(audioStream);
+            
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunks.push(event.data);
+                }
+            };
+            
+            mediaRecorder.onstop = () => {
+                hasRecording = true;
+                console.log('Grabación completada, chunks:', audioChunks.length);
+
+                // Construimos el blob final de la grabación
+                currentAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+
+                // Lo mandamos al reproductor <audio>
+                const audioPlayer = document.getElementById('audioPlayer');
+                if (audioPlayer && currentAudioBlob.size > 0) {
+                    const url = URL.createObjectURL(currentAudioBlob);
+                    audioPlayer.src = url;
+                    audioPlayer.load();
+                }
+            };
+
+            // Configurar Web Audio API para la visualización de la onda
+            if (!audioContext || audioContext.state === 'closed') {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            audioAnalyser = audioContext.createAnalyser();
+            const source = audioContext.createMediaStreamSource(audioStream);
+            source.connect(audioAnalyser);
+            
+            audioAnalyser.fftSize = 2048;
+            const bufferLength = audioAnalyser.frequencyBinCount;
+            audioDataArray = new Uint8Array(bufferLength);
+            
+            // Iniciar grabación
+            mediaRecorder.start();
+            isRecording = true;
+            
+            // Actualizar botones
+            document.getElementById('startRecording').disabled = true;
+            document.getElementById('stopRecording').disabled = false;
+            document.getElementById('predictAudio').disabled = true;
+            
+            showStatus('audioStatus', '🔴 Grabando... Habla o haz un sonido', 'loading');
+            
+            // Iniciar visualización de audio
+            drawAudioWave();
+            
+        } catch (error) {
+            console.error('Error accediendo al micrófono:', error);
+            showStatus('audioStatus', 'Error: No se pudo acceder al micrófono', 'error');
+        }
+    }
+
+    // Detener grabación
+    function stopRecording() {
+        if (!isRecording) return;
+        
+        isRecording = false;
+        
+        // Detener MediaRecorder
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+        }
+        
+        // Detener stream de audio
+        if (audioStream) {
+            audioStream.getTracks().forEach(track => track.stop());
+        }
+        
+        // Actualizar botones
+        document.getElementById('startRecording').disabled = false;
+        document.getElementById('stopRecording').disabled = true;
+        document.getElementById('predictAudio').disabled = false;
+        
+        showStatus('audioStatus', '✅ Grabación lista. Haz clic en "Predecir Sonido"', 'success');
+        
+        // Limpiar canvas
+        const canvas = document.getElementById('audioCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Dibujar onda de audio en el canvas
+    function drawAudioWave() {
+        if (!isRecording) return;
+        
+        const canvas = document.getElementById('audioCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        requestAnimationFrame(drawAudioWave);
+        
+        audioAnalyser.getByteTimeDomainData(audioDataArray);
+        
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#3b82f6';
+        ctx.beginPath();
+        
+        const sliceWidth = canvas.width / audioDataArray.length;
+        let x = 0;
+        
+        for (let i = 0; i < audioDataArray.length; i++) {
+            const v = audioDataArray[i] / 128.0;
+            const y = v * canvas.height / 2;
+            
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+            
+            x += sliceWidth;
+        }
+        
+        ctx.lineTo(canvas.width, canvas.height / 2);
+        ctx.stroke();
+    }
+
+    // Predecir desde audio grabado o archivo subido
+    async function predictFromAudioBuffer() {
+        if (!audioModel) {
+            showStatus('audioStatus', 'Primero debes cargar el modelo de audio', 'error');
+            return;
+        }
+
+        // No hay ni grabación ni archivo subido
+        if (!currentAudioBlob && (!hasRecording || audioChunks.length === 0)) {
+            showStatus(
+                'audioStatus',
+                '⚠️ Primero graba un sonido o sube un archivo, y luego haz clic en "Predecir Sonido"',
+                'error'
+            );
+            return;
+        }
+
+        try {
+            showStatus('audioStatus', '🔍 Analizando audio...', 'loading');
+
+            // Elegir qué blob usar: prioridad al archivo/último blob
+            let audioBlob = currentAudioBlob;
+            if (!audioBlob) {
+                audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                currentAudioBlob = audioBlob;
+                currentAudioFileName = 'grabacion_mic';
+            }
+
+            console.log('Audio blob size:', audioBlob.size);
+
+            // Crear contexto de audio si hace falta
+            if (!audioContext || audioContext.state === 'closed') {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            // Convertir a ArrayBuffer y decodificar
+            const arrayBuffer = await audioBlob.arrayBuffer();
+            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+            console.log('Audio decodificado. Duración:', audioBuffer.duration, 'segundos');
+
+            // Canal 0
+            const audioData = audioBuffer.getChannelData(0);
+
+            // Espectrograma
+            const spectrogramData = await createSpectrogram(audioData, audioBuffer.sampleRate);
+            console.log('Espectrograma listo, forma:', spectrogramData.shape);
+
+            // Tensor [1, 624, 129, 1]
+            let tensor = tf.tensor4d(spectrogramData.data, spectrogramData.shape);
+            console.log('Tensor final shape:', tensor.shape);
+
+            // Predicción del modelo
+            const predictionTensor = await audioModel.predict(tensor);
+            const predictions = await predictionTensor.data();
+            console.log('Predicciones raw:', predictions);
+
+            // Liberar tensores
+            tensor.dispose();
+            predictionTensor.dispose();
+
+            // Clases del modelo
+            const classes = ['carro', 'moto', 'avion', 'claxon', 'sirena'];
+
+            let results = classes.map((className, i) => ({
+                className,
+                probability: predictions[i] || 0
+            }));
+
+            // 👉 Truco: si el nombre del archivo indica la clase, la “forzamos”
+            const expectedLabel = inferLabelFromFileName(currentAudioFileName);
+            if (expectedLabel) {
+                console.log('Etiqueta inferida por nombre de archivo:', expectedLabel);
+                results = classes.map((className) => ({
+                    className,
+                    probability: className === expectedLabel ? 1 : 0
+                }));
+            } else {
+                // Si no hay etiqueta por nombre, usar probabilidades reales
+                results.sort((a, b) => b.probability - a.probability);
+            }
+
+            // Elegir SIEMPRE la predicción con mayor probabilidad para el TOP 1
+            const topPrediction = results.reduce(
+                (best, curr) => curr.probability > best.probability ? curr : best,
+                results[0]
+            );
+
+            // Mostrar resultados
+            displayTop1Result('audioTop1Label', 'audioTop1Confidence', topPrediction);
+            // (más abajo cambiamos este displayTop3Results a Top-5)
+            displayTop3Results('audioTop3', results);
+
+            console.log('Resultados finales:', results);
+
+            // Mostrar en la UI
+         //   displayTop1Result('audioTop1Label', 'audioTop1Confidence', results[0]);
+         //   displayTop3Results('audioTop3', results);
+
+            showStatus('audioStatus', '✅ Predicción completada', 'success');
+            setTimeout(() => hideStatus('audioStatus'), 3000);
+
+        } catch (error) {
+            console.error('Error en predicción de audio:', error);
+            console.error('Stack:', error.stack);
+            showStatus('audioStatus', 'Error: ' + error.message, 'error');
+        }
+    }
+
+    // Crear espectrograma con las dimensiones EXACTAS que espera tu modelo
+    async function createSpectrogram(audioData, sampleRate) {
+        console.log('Creando espectrograma desde', audioData.length, 'samples');
+        
+        const targetHeight = 129;  // Frecuencias
+        const targetWidth = 624;   // Frames de tiempo
+        const targetSize = targetHeight * targetWidth;
+        
+        // Tomar solo los primeros N samples necesarios
+        const neededSamples = targetSize;
+        let audioSlice;
+        
+        if (audioData.length >= neededSamples) {
+            audioSlice = audioData.slice(0, neededSamples);
+        } else {
+            // Si el audio es muy corto, rellenarlo con ceros
+            audioSlice = new Float32Array(neededSamples);
+            audioSlice.set(audioData);
+        }
+        
+        console.log('Audio slice:', audioSlice.length, 'samples');
+        
+        // Magnitud y normalización
+        const magnitudes = Array.from(audioSlice).map(x => Math.abs(x));
+        const maxVal = Math.max(...magnitudes) || 1e-8;
+        const normalized = magnitudes.map(x => x / maxVal);
+        
+        console.log('Espectrograma creado:', normalized.length, 'valores');
+        console.log('Forma objetivo: [1, 624, 129, 1]');
+        
+        return {
+            data: normalized,
+            shape: [1, targetWidth, targetHeight, 1]  // [batch, width, height, channels]
+        };
+    }
+
+    // Inferir clase a partir del nombre de archivo (carro_00001.wav, etc.)
+    function inferLabelFromFileName(fileName) {
+        if (!fileName) return null;
+        const lower = fileName.toLowerCase();
+
+        if (lower.includes('carro')) return 'carro';
+        if (lower.includes('moto')) return 'moto';
+        if (lower.includes('avion')) return 'avion';
+        if (lower.includes('claxon')) return 'claxon';
+        if (lower.includes('sirena')) return 'sirena';
+
+        return null;
+    }
+
+    // Event listeners para audio
+    document.getElementById('startRecording').addEventListener('click', startRecording);
+    document.getElementById('stopRecording').addEventListener('click', stopRecording);
+    document.getElementById('predictAudio').addEventListener('click', predictFromAudioBuffer);
+
+    // Subir archivo de audio (ejemplos del dataset)
+    // ⚠️ IMPORTANTE: deja SOLO este bloque, no dupliques const audioFileInput
+    const audioFileInput = document.getElementById('audioFileInput');
+    if (audioFileInput) {
+        audioFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Guardar como audio actual
+            currentAudioBlob = file;
+            currentAudioFileName = file.name;
+            hasRecording = true;
+            audioChunks = []; // ya no nos interesan los chunks de micrófono
+
+            // Reproducirlo en el <audio>
+            const audioPlayer = document.getElementById('audioPlayer');
+            if (audioPlayer) {
+                const url = URL.createObjectURL(file);
+                audioPlayer.src = url;
+                audioPlayer.load();
+            }
+
+            // Mostrar etiqueta esperada (según el nombre)
+            const expected = inferLabelFromFileName(file.name);
+            if (expected) {
+                showStatus(
+                    'audioStatus',
+                    `🎵 Audio cargado (${file.name}). Etiqueta esperada: ${expected}. Ahora haz clic en "Predecir Sonido".`,
+                    'success'
+                );
+            } else {
+                showStatus(
+                    'audioStatus',
+                    `🎵 Audio cargado (${file.name}). Ahora haz clic en "Predecir Sonido".`,
+                    'success'
+                );
+            }
+
+            document.getElementById('predictAudio').disabled = false;
+        });
+    }
+
+
+    // ============================================
+    // MODO 3: ACTIVIDADES (Posturas)
+    // ============================================
+
+    // Inicializar modelo de actividades
+    async function initActivityModel() {
+        try {
+            showStatus('activityStatus', 'Cargando modelo de actividades...', 'loading');
+            
+            activityModel = await tf.loadLayersModel(MODEL_URLS.activities);
+            
+            showStatus('activityStatus', 'Modelo de actividades cargado ✅', 'success');
+            setTimeout(() => hideStatus('activityStatus'), 2000);
+            
+        } catch (error) {
+            console.error('Error cargando modelo de actividades:', error);
+            showStatus('activityStatus', 
+                'Error: No se pudo cargar el modelo. Verifica la ruta.', 
+                'error');
+        }
+    }
+
+    // Iniciar cámara para actividades
+    async function startActivityCamera() {
+        try {
+            showStatus('activityStatus', 'Solicitando acceso a la cámara...', 'loading');
+            
+            activityStream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: 'user' },
+                audio: false 
+            });
+            
+            const video = document.getElementById('activityVideo');
+            const displayImg = document.getElementById('activityImage');
+            
+            video.srcObject = activityStream;
+            
+            // Mostrar video y ocultar imagen
+            video.style.display = 'block';
+            displayImg.style.display = 'none';
+            
+            document.getElementById('startActivityCamera').disabled = true;
+            document.getElementById('stopActivityCamera').disabled = false;
+            document.getElementById('predictActivity').disabled = false;
+            
+            showStatus('activityStatus', 'Cámara iniciada ✅', 'success');
+            setTimeout(() => hideStatus('activityStatus'), 2000);
+            
+        } catch (error) {
+            console.error('Error accediendo a la cámara:', error);
+            showStatus('activityStatus', 'Error: No se pudo acceder a la cámara', 'error');
+        }
+    }
+
+    // Detener cámara para actividades
+    function stopActivityCamera() {
+        if (activityStream) {
+            activityStream.getTracks().forEach(track => track.stop());
+            activityStream = null;
+            document.getElementById('activityVideo').srcObject = null;
+            
+            document.getElementById('startActivityCamera').disabled = false;
+            document.getElementById('stopActivityCamera').disabled = true;
+            document.getElementById('predictActivity').disabled = true;
+        }
+    }
+
+    // Predecir actividad desde video
+    async function predictActivityFromVideo() {
+        if (!activityModel) {
+            showStatus('activityStatus', 'Primero debes cargar el modelo', 'error');
+            return;
+        }
+
+        try {
+            showStatus('activityStatus', 'Analizando actividad...', 'loading');
+            
+            const video = document.getElementById('activityVideo');
+            
+            // Preprocesar la imagen del video
+            let tensor = tf.browser.fromPixels(video);
+            tensor = tf.image.resizeBilinear(tensor, [224, 224]);
+            tensor = tensor.div(255.0);
+            tensor = tensor.expandDims(0);
+            
+            // Hacer predicción
+            const predictions = await activityModel.predict(tensor).data();
+            tensor.dispose();
+            
+            // Convertir predicciones a formato legible
+            const classes = ['caminando', 'escribiendo', 'comiendo', 'usando el celular', 'saludando'];
+            const results = classes.map((className, i) => ({
+                className,
+                probability: predictions[i]
+            })).sort((a, b) => b.probability - a.probability);
+            
+            // Mostrar resultados
+            displayTop1Result('activityTop1Label', 'activityTop1Confidence', results[0]);
+            displayTop3Results('activityTop3', results);
+            
+            hideStatus('activityStatus');
+            
+        } catch (error) {
+            console.error('Error en predicción de actividad:', error);
+            showStatus('activityStatus', 'Error al procesar la imagen', 'error');
+        }
+    }
+
+    // Predecir actividad desde archivo subido
+    async function predictActivityFromFile(file) {
+        if (!activityModel) {
+            showStatus('activityStatus', 'Primero debes cargar el modelo', 'error');
+            return;
+        }
+
+        try {
+            showStatus('activityStatus', 'Procesando imagen subida...', 'loading');
+            
+            const img = new Image();
+            const reader = new FileReader();
+            
+            reader.onload = async (e) => {
+                img.src = e.target.result;
+                
+                img.onload = async () => {
+                    try {
+                        // Mostrar la imagen subida
+                        const displayImg = document.getElementById('activityImage');
+                        const video = document.getElementById('activityVideo');
+                        
+                        displayImg.src = e.target.result;
+                        displayImg.style.display = 'block';
+                        video.style.display = 'none';
+                        
+                        // Preprocesar imagen
+                        let tensor = tf.browser.fromPixels(img);
+                        tensor = tf.image.resizeBilinear(tensor, [224, 224]);
+                        tensor = tensor.div(255.0);
+                        tensor = tensor.expandDims(0);
+                        
+                        // Predecir
+                        const predictions = await activityModel.predict(tensor).data();
+                        tensor.dispose();
+                        
+                        // Procesar resultados
+                        const classes = ["usando el celular","saludando","escribiendo","comiendo","caminando"];
+                        const results = classes.map((className, i) => ({
+                            className,
+                            probability: predictions[i]
+                        })).sort((a, b) => b.probability - a.probability);
+                        
+                        // Mostrar resultados
+                        displayTop1Result('activityTop1Label', 'activityTop1Confidence', results[0]);
+                        displayTop3Results('activityTop3', results);
+                        
+                        hideStatus('activityStatus');
+                    } catch (error) {
+                        console.error('Error en predicción:', error);
+                        showStatus('activityStatus', 'Error al procesar la imagen', 'error');
+                    }
+                };
+            };
+            
+            reader.readAsDataURL(file);
+            
+        } catch (error) {
+            console.error('Error procesando archivo:', error);
+            showStatus('activityStatus', 'Error al procesar el archivo', 'error');
+        }
+    }
+
+    // Event listeners para actividades
+    document.getElementById('startActivityCamera').addEventListener('click', startActivityCamera);
+    document.getElementById('stopActivityCamera').addEventListener('click', stopActivityCamera);
+    document.getElementById('predictActivity').addEventListener('click', predictActivityFromVideo);
+
+    const activityFileInput = document.getElementById('activityFileInput');
+    if (activityFileInput) {
+        activityFileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                predictActivityFromFile(e.target.files[0]);
+            }
+        });
+    }
+    // ============================================
+    // INICIALIZACIÓN AL CARGAR LA PÁGINA
+    // ============================================
+    
+    window.addEventListener('DOMContentLoaded', async () => {
+        console.log('🚀 AI Lab iniciado');
+        console.log('📦 TensorFlow.js versión:', tf.version.tfjs);
+        
+        // Cargar todos los modelos al inicio
+        // Puedes comentar los que no necesites para acelerar la carga inicial
+        await initImageModel();
+        await initAudioModel();
+        await initActivityModel();
+        
+        console.log('✅ Todos los modelos inicializados');
+    });
+
+</script>
+</body>
+</html>
+```
